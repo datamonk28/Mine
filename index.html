@@ -1,11 +1,12 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>For Her</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Great+Vibes&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Great+Vibes&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -15,35 +16,62 @@
   --blush-lt:#f0a0b4;
   --cream:#fef9f5;
   --mauve:#e8c8d8;
+  --plum:#7c3d6e;
   --bg:#160d1c;
+  --bg2:#1e0f28;
 }
 
-html{scroll-behavior:smooth;}
+html{scroll-behavior:smooth}
 body{
   background:var(--bg);
   color:var(--cream);
-  font-family:'Libre Baskerville',serif;
+  font-family:'Libre Baskerville', serif;
   overflow-x:hidden;
+}
+
+/* LOCK SCREEN */
+#lock{
+  position:fixed;inset:0;z-index:100;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  background:#0e0814;
+}
+.lock-title{
+  font-family:'Great Vibes',cursive;
+  font-size:3rem;
+  margin-bottom:10px;
+}
+input{
+  padding:10px;
+  text-align:center;
+  border:none;
+  border-bottom:1px solid var(--blush);
+  background:transparent;
+  color:white;
+}
+button{
+  margin-top:10px;
+  padding:10px 25px;
+  cursor:pointer;
 }
 
 /* HERO */
 .hero{
-  min-height:100vh;
+  height:100vh;
   display:flex;
-  align-items:center;
-  justify-content:center;
   flex-direction:column;
+  justify-content:center;
+  align-items:center;
   text-align:center;
 }
-
 .hero-name{
   font-family:'Great Vibes',cursive;
-  font-size:4rem;
+  font-size:5rem;
 }
 
 /* SECTION */
 .section{
-  padding:80px 24px;
+  padding:80px 20px;
   opacity:0;
   transform:translateY(40px);
   transition:0.8s ease;
@@ -53,160 +81,184 @@ body{
   transform:translateY(0);
 }
 
-/* PHOTO */
-.photo-grid{
+/* GRID */
+.grid{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
   gap:20px;
 }
-
-.photo-card{
+.card{
   height:300px;
-  background:#1e0f28;
+  background:var(--bg2);
   display:flex;
   align-items:center;
   justify-content:center;
-  transition:0.3s;
   cursor:pointer;
+  transition:0.3s;
 }
-
-.photo-card.active{
+.card.active{
   outline:2px solid var(--blush-lt);
-  outline-offset:4px;
   box-shadow:0 0 30px var(--blush);
   transform:scale(1.05);
 }
 
-/* LOCK */
-#lock-screen{
-  position:fixed;
-  inset:0;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  background:#0e0814;
-}
-
-button{padding:10px 20px;margin-top:10px}
-
-/* MUSIC BTN */
-#music-toggle{
+/* MUSIC BUTTON */
+#music-btn{
   position:fixed;
   top:20px;
   right:20px;
+}
+
+/* PETALS */
+#particles{position:fixed;inset:0;pointer-events:none;z-index:0}
+.petal{
+  position:absolute;
+  width:10px;height:14px;
+  background:var(--blush-lt);
+  border-radius:50% 0 50% 0;
+  animation:fall linear infinite;
+}
+@keyframes fall{
+  0%{transform:translateY(-20px);opacity:0}
+  10%{opacity:0.7}
+  100%{transform:translateY(100vh);opacity:0}
+}
+
+/* TREASURE */
+#treasure-modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.8);
+  justify-content:center;
+  align-items:center;
+}
+#treasure-modal.open{display:flex}
+.box{
+  background:#1e0f28;
+  padding:30px;
+  border-radius:10px;
+  text-align:center;
 }
 </style>
 </head>
 
 <body>
 
-<audio id="bg-audio" loop>
+<div id="particles"></div>
+
+<audio id="music" loop>
   <source src="music/your-song.mp3" type="audio/mpeg">
 </audio>
-<button id="music-toggle">♪</button>
+<button id="music-btn">♪</button>
 
-<div id="lock-screen">
-  <h1 style="font-family:'Great Vibes';">A World For You</h1>
-  <input id="pwd-input" type="password" placeholder="enter password">
-  <button onclick="tryUnlock()">Enter</button>
+<div id="lock">
+  <div class="lock-title">A World For You</div>
+  <input id="pwd" type="password" placeholder="enter password">
+  <button onclick="unlock()">Enter</button>
 </div>
 
 <div id="main" style="display:none">
 
-<section class="hero">
+<div class="hero">
   <div class="hero-name">My Love</div>
-  <div onclick="smoothScrollTo(document.querySelector('.section'))">
-    Scroll ↓
-  </div>
-</section>
-
-<div class="section">
-  <div class="photo-grid" id="photo-grid"></div>
+  <div onclick="scrollToSection()">Scroll ↓</div>
 </div>
 
+<div class="section" id="section">
+  <div class="grid" id="grid"></div>
+</div>
+
+<div style="text-align:center;padding:50px">
+  <button onclick="openTreasure()">🎁 Treasure</button>
+</div>
+
+</div>
+
+<div id="treasure-modal">
+  <div class="box">
+    <h2 style="font-family:'Great Vibes'">I love you ❤️</h2>
+    <button onclick="closeTreasure()">Close</button>
+  </div>
 </div>
 
 <script>
 const PASSWORD="yoursecretword";
 
-/* SMOOTH SCROLL */
-function smoothScrollTo(target, duration=900){
-  const targetY=target.getBoundingClientRect().top+window.pageYOffset;
-  const startY=window.scrollY;
-  const diff=targetY-startY;
-  let start;
-
-  function ease(t){
-    return t<0.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+/* UNLOCK */
+function unlock(){
+  if(document.getElementById('pwd').value===PASSWORD){
+    document.getElementById('lock').style.display='none';
+    document.getElementById('main').style.display='block';
+    fadeMusic();
   }
-
-  function step(timestamp){
-    if(!start) start=timestamp;
-    const progress=Math.min((timestamp-start)/duration,1);
-    window.scrollTo(0,startY+diff*ease(progress));
-    if(progress<1) requestAnimationFrame(step);
-  }
-
-  requestAnimationFrame(step);
 }
 
-/* SECTION REVEAL */
-const observer=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{
-    if(e.isIntersecting) e.target.classList.add('visible');
-  });
-},{threshold:0.2});
-
-document.querySelectorAll('.section').forEach(s=>observer.observe(s));
-
 /* MUSIC */
-const audio=document.getElementById('bg-audio');
-const btn=document.getElementById('music-toggle');
+const music=document.getElementById('music');
+document.getElementById('music-btn').onclick=()=>{
+  if(music.paused) music.play();
+  else music.pause();
+};
 
-function fadeInMusic(){
-  audio.volume=0;
-  audio.play();
+function fadeMusic(){
+  music.volume=0;
+  music.play();
   let v=0;
   const i=setInterval(()=>{
     v+=0.02;
     if(v>=0.4){v=0.4;clearInterval(i);}
-    audio.volume=v;
+    music.volume=v;
   },120);
 }
 
-btn.onclick=()=>{
-  if(audio.paused) audio.play();
-  else audio.pause();
-};
-
-/* UNLOCK */
-function tryUnlock(){
-  if(document.getElementById('pwd-input').value===PASSWORD){
-    document.getElementById('lock-screen').style.display='none';
-    document.getElementById('main').style.display='block';
-    fadeInMusic();
-  }
+/* SCROLL */
+function scrollToSection(){
+  document.getElementById('section').scrollIntoView({behavior:'smooth'});
 }
 
-/* PHOTOS */
-const grid=document.getElementById('photo-grid');
+/* SECTION ANIMATION */
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting) e.target.classList.add('visible');
+  });
+});
+document.querySelectorAll('.section').forEach(s=>observer.observe(s));
 
+/* PHOTOS */
+const grid=document.getElementById('grid');
 for(let i=1;i<=6;i++){
   const card=document.createElement('div');
-  card.className='photo-card';
+  card.className='card';
   card.innerText='Photo '+i;
 
   card.onclick=()=>{
-    document.querySelectorAll('.photo-card')
-      .forEach(c=>c.classList.remove('active'));
-
+    document.querySelectorAll('.card').forEach(c=>c.classList.remove('active'));
     card.classList.add('active');
   };
 
   grid.appendChild(card);
 }
+
+/* PETALS */
+const container=document.getElementById('particles');
+for(let i=0;i<25;i++){
+  const p=document.createElement('div');
+  p.className='petal';
+  p.style.left=Math.random()*100+'%';
+  p.style.animationDuration=5+Math.random()*10+'s';
+  container.appendChild(p);
+}
+
+/* TREASURE */
+function openTreasure(){
+  document.getElementById('treasure-modal').classList.add('open');
+}
+function closeTreasure(){
+  document.getElementById('treasure-modal').classList.remove('open');
+}
 </script>
 
 </body>
 </html>
+```
